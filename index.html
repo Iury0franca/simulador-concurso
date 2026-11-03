@@ -1,0 +1,215 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Meu Simulador de Concursos</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#edf2f8;font-family:Arial,sans-serif;color:#203047}
+header{background:#173b67;color:white;padding:25px 18px;text-align:center}
+header h1{margin:0;font-size:25px}
+header p{font-size:14px}
+main{max-width:650px;margin:auto;padding:16px}
+.card{background:white;border-radius:17px;padding:20px;margin:15px 0;box-shadow:0 3px 12px #0001}
+button{font:inherit;cursor:pointer}
+.opcao{display:block;width:100%;text-align:left;background:#f5f7fa;border:2px solid #e2e8f0;border-radius:12px;padding:14px;margin:10px 0;color:#203047}
+.opcao:disabled{opacity:.75}
+.certa{background:#d9f8e6!important;border-color:#20a466!important}
+.errada{background:#ffe3e3!important;border-color:#df5353!important}
+#proxima,.principal{background:#173b67;color:white;border:0;border-radius:12px;padding:14px 20px;width:100%;margin-top:12px}
+#proxima{display:none}
+#explicacao{display:none;background:#edf7ff;padding:15px;border-radius:12px;line-height:1.5;margin-top:15px}
+#placar{font-weight:bold;color:#173b67}
+small{color:#64748b}
+</style>
+</head>
+<body>
+<header>
+<h1>📚 Meu Simulador</h1>
+<p>Concurso Público • Aparecida de Goiânia</p>
+</header>
+<main>
+<div class="card">
+<div id="placar">Acertos: 0 | Respondidas: 0</div>
+<p><small>Questões da UFG 2011 • Conhecimentos Específicos</small></p>
+</div>
+<div class="card" id="area">
+<h3 id="numero"></h3>
+<p id="pergunta"></p>
+<div id="alternativas"></div>
+<div id="explicacao"></div>
+<button id="proxima" onclick="avancar()">Próxima questão →</button>
+</div>
+<button class="principal" onclick="reiniciar()">Reiniciar treinamento</button>
+</main>
+<script>
+const questoes=[
+{
+n:41,
+p:"Qual é um comportamento adequado no exercício da recepção?",
+o:[
+"Acolher o visitante com saudações efusivas e informais.",
+"Atender às pessoas que necessitam de cuidados especiais com distinção.",
+"Atender às pessoas sem questioná-las sobre suas demandas.",
+"Receber um recado sem registrá-lo."
+],
+r:1,
+e:"O atendimento deve considerar as necessidades específicas das pessoas, com respeito e profissionalismo. Por isso, a alternativa B é a correta."
+},
+{
+n:43,
+p:"A análise de um caso que apresenta solução favorável ou contrária, justificada por dispositivos legais e informações, é chamada de:",
+o:["Memorando","Ficha de reunião","Parecer","Relatório"],
+r:2,
+e:"O parecer é um documento que apresenta análise fundamentada e uma conclusão sobre determinado assunto."
+},
+{
+n:44,
+p:"Qual procedimento é adequado no atendimento telefônico profissional?",
+o:[
+"Utilizar frases longas e complexas.",
+"Utilizar termos afetuosos.",
+"Utilizar termos informais.",
+"Utilizar concordância verbal e nominal."
+],
+r:3,
+e:"A comunicação profissional exige clareza e correção gramatical. A alternativa D é a indicada pelo gabarito."
+},
+{
+n:45,
+p:"Uma das principais atribuições da área de Recursos Humanos é:",
+o:[
+"Realizar pesquisas em laboratórios.",
+"Cuidar da higiene, saúde e segurança no trabalho.",
+"Pesquisar tendências de mercado.",
+"Buscar fontes de financiamento."
+],
+r:1,
+e:"Recursos Humanos atua na gestão de pessoas, incluindo saúde, higiene e segurança no ambiente de trabalho."
+},
+{
+n:46,
+p:"Qual alternativa representa uma competência intelectual do administrador?",
+o:[
+"Raciocinar, analisar, planejar e tomar decisões.",
+"Conhecer apenas as tarefas técnicas da equipe.",
+"Executar somente atividades operacionais.",
+"Relacionar-se exclusivamente com pessoas da organização."
+],
+r:0,
+e:"Competências intelectuais envolvem raciocínio, análise, planejamento, formulação de estratégias e decisões."
+},
+{
+n:47,
+p:"Uma característica indispensável para realizar um planejamento é:",
+o:["Reatividade","Inflexibilidade","Proatividade","Imprevisibilidade"],
+r:2,
+e:"Planejar significa antecipar situações e preparar ações futuras. Isso exige proatividade."
+},
+{
+n:48,
+p:"O planejamento que envolve missão organizacional, análise do ambiente e pontos fortes, fracos, oportunidades e ameaças é:",
+o:["Tático","Operacional","Funcional","Estratégico"],
+r:3,
+e:"O planejamento estratégico define diretrizes amplas e de longo prazo. A análise SWOT é uma ferramenta desse planejamento."
+},
+{
+n:49,
+p:"O local sob a guarda de um responsável, onde ficam fisicamente armazenados estoques de uma ou várias empresas, é denominado:",
+o:["Backlog","Armazém","Centro de distribuição","Garagem"],
+r:1,
+e:"Armazém é o local destinado à guarda e conservação física de materiais e mercadorias."
+},
+{
+n:40,
+p:"Uma das funções dos serviços de protocolo é:",
+o:[
+"Receber, separar e distribuir correspondências.",
+"Receber, separar e arquivar todas as correspondências.",
+"Distribuir somente correspondências particulares.",
+"Receber e guardar todas as correspondências."
+],
+r:0,
+e:"O protocolo participa do recebimento, registro, controle e encaminhamento dos documentos. Na prova, a alternativa A é a correta."
+},
+{
+n:38,
+p:"Segundo o gabarito da prova de 2011, quais são as espécies de arquivos públicos apresentadas?",
+o:[
+"Correntes, rotativos e permanentes.",
+"Permanentes, organizacionais e temporários.",
+"Correntes, temporários e permanentes.",
+"Organizacionais, estruturados e rotativos."
+],
+r:2,
+e:"O gabarito histórico indica a alternativa C. Atenção: na terminologia arquivística atual, é comum a classificação em correntes, intermediários e permanentes."
+}
+];
+
+let indice=0,acertos=0,respondidas=0;
+let erros=[];
+
+function mostrar(){
+const q=questoes[indice];
+document.getElementById("numero").textContent=
+"Questão "+(indice+1)+" de "+questoes.length+" • Original nº "+q.n;
+document.getElementById("pergunta").textContent=q.p;
+document.getElementById("explicacao").style.display="none";
+document.getElementById("proxima").style.display="none";
+const area=document.getElementById("alternativas");
+area.innerHTML="";
+q.o.forEach((op,i)=>{
+const b=document.createElement("button");
+b.className="opcao";
+b.textContent="ABCD"[i]+") "+op;
+b.onclick=()=>responder(i);
+area.appendChild(b);
+});
+}
+
+function responder(escolha){
+const q=questoes[indice];
+const botoes=document.querySelectorAll(".opcao");
+botoes.forEach((b,i)=>{
+b.disabled=true;
+if(i===q.r)b.classList.add("certa");
+if(i===escolha&&i!==q.r)b.classList.add("errada");
+});
+respondidas++;
+if(escolha===q.r){acertos++}
+else{erros.push(q.n)}
+document.getElementById("placar").textContent=
+"Acertos: "+acertos+" | Respondidas: "+respondidas;
+const exp=document.getElementById("explicacao");
+exp.style.display="block";
+exp.innerHTML=(escolha===q.r?"✅ Correto! ":"❌ Você errou. ")+
+"<br><strong>Resposta: "+ "ABCD"[q.r]+
+"</strong><br>"+q.e;
+document.getElementById("proxima").style.display="block";
+localStorage.setItem("simuladorResultado",JSON.stringify({
+acertos,respondidas,erros
+}));
+}
+
+function avancar(){
+indice++;
+if(indice<questoes.length){mostrar();return}
+document.getElementById("area").innerHTML=
+"<h2>🎉 Treinamento concluído!</h2>"+
+"<p>Você acertou <strong>"+acertos+" de "+questoes.length+
+"</strong> questões.</p>"+
+"<p>Aproveitamento: <strong>"+
+Math.round(acertos/questoes.length*100)+"%</strong></p>"+
+"<p>Questões para revisar: "+
+(erros.length?erros.join(", "):"Nenhuma! Parabéns!")+"</p>";
+}
+
+function reiniciar(){
+location.reload();
+}
+mostrar();
+</script>
+</body>
+</html>
